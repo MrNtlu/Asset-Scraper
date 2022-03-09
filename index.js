@@ -1,5 +1,7 @@
 const request = require("request-promise")
-const cheerio = require("cheerio")
+const cheerio = require("cheerio");
+const { connectToMongoDB } = require("./mongodb");
+const saveExchangeModel = require("./mongodb");
 
 async function getCommodityPrices() {
     commodityPriceList = [];
@@ -35,7 +37,7 @@ async function getExchangeRates() {
     const result = await request.get("https://www.forex-ratings.com/currency-exchange-rates/");
     const $ = cheerio.load(result);
 
-    $(".list-group > .list-group-item").each((index, element) => {
+    $(".list-group > .list-group-item").each((_, element) => {
         exchangeList.push($(element).text().split("(")[1].replace(")", ''));
     });
 
@@ -43,34 +45,39 @@ async function getExchangeRates() {
         const rateResult = await request.get("https://www.forex-ratings.com/currency-exchange-rates/"+exchangeList[index]);
         const $ = cheerio.load(rateResult);
 
-        $("table").each((index, element) => {
-            if (index == 0) {
+        $("table").each((innerIndex, element) => {
+            if (innerIndex == 0) {
                 $(element).find("tbody > tr").each((_, innerElement) => {
-                    var exchangeName;
                     var exchangeSymbol;
                     var exchangeRate;
                     $(innerElement).find("td").each((i, e) => {
                         const itemText = $(e).text();
                         if (i == 0) {
-                            exchangeName = itemText.split("(")[0].trimEnd();
                             exchangeSymbol = itemText.split("(")[1].replace(")", '');
                         } else if (i == 2) {
                             exchangeRate = parseFloat(itemText.split(" ")[0]);
                         }
                     });
-                    exchangePriceList.push({
-                        "name": exchangeName,
-                        "from": exchange,
-                        "to": exchangeSymbol,
-                        "exchange_rate": exchangeRate
-                    });
+
+                    saveExchangeModel(exchangeList[index], exchangeSymbol, exchangeRate);
                 });
             }
         });
     }
 
-    console.log(exchangePriceList);
+    console.log(exchangeList);
 }
 
-getCommodityPrices();
-getExchangeRates();
+/*TODO: 
+Save exchange list to database
+Save commodity to investings
+*/
+
+async function main() {
+    await connectToMongoDB();
+
+    getCommodityPrices();
+    getExchangeRates();
+}
+
+main();
