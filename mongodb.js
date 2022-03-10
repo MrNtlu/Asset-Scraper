@@ -3,7 +3,7 @@ require('dotenv').config()
 
 async function connectToMongoDB() {
     await mongoose.connect(
-        process.env.MONGO_LOCAL_URI, 
+        process.env.MONGO_URI,
         { 
             useNewUrlParser: true
         }
