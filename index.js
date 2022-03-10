@@ -100,8 +100,12 @@ async function getExchangeRates() {
 }
 
 async function main() {
-    await connectToMongoDB();
-    await getExchangeRates();
+    try{
+        await connectToMongoDB();
+        await getExchangeRates();
+    } catch(err) {
+        console.log('Error occured', err);
+    }
 }
 
 main();
