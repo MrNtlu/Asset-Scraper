@@ -10,12 +10,20 @@ async function connectToMongoDB() {
     );
 }
 
+function disconnectFromMongoDB() { 
+    mongoose.disconnect();
+    console.log("Disconnected from db.");
+}
+
 const ExchangeModel = mongoose.model(
     "exchange", 
     mongoose.Schema({
         from_exchange: String,
         to_exchange: String,
-        exchange_rate: Number
+        exchange_rate: Number,
+        created_at: Date
+    }, {
+        versionKey: false
     }
 ));
 
@@ -25,36 +33,16 @@ const InvestingModel = mongoose.model(
       _id: mongoose.Schema({
           symbol: String,
           type: String
-      }),
+      }, { _id : false }),
       name: String,
       price: Number,
       created_at: Date
+  }, {
+    versionKey: false
   }
 ));
 
-async function saveExchangeModel(fromExchange, toExchange, exchangeRate) {
-    try {
-        const exchangeModel = new ExchangeModel({
-            from_exchange: fromExchange,
-            to_exchange: toExchange,
-            exchange_rate: exchangeRate
-        });
-        await exchangeModel.save();
-    } catch (error) {
-        console.log("Error occured ", error);
-    }
-}
-
-async function saveInvestingModel(symbol, type, name, price) {
-    try {
-        const investingModel = new InvestingModel({
-
-        });
-        await investingModel.save();
-    } catch (error) {
-        console.log("Error occured ", error);
-    }
-}
-
-module.exports = saveExchangeModel;
+module.exports.InvestingModel = InvestingModel;
+module.exports.ExchangeModel = ExchangeModel;
 module.exports.connectToMongoDB = connectToMongoDB;
+module.exports.disconnectFromMongoDB = disconnectFromMongoDB;

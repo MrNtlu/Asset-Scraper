@@ -1,11 +1,8 @@
 const request = require("request-promise")
 const cheerio = require("cheerio");
-const { connectToMongoDB } = require("./mongodb");
-const saveExchangeModel = require("./mongodb");
+const { connectToMongoDB, ExchangeModel, InvestingModel, disconnectFromMongoDB } = require("./mongodb");
 
-async function getCommodityPrices() {
-    commodityPriceList = [];
-    
+async function getCommodityPrices(investingList) {    
     const result = await request.get("https://markets.businessinsider.com/commodities");
     const $ = cheerio.load(result);
 
@@ -20,17 +17,29 @@ async function getCommodityPrices() {
                     commodityPrice = parseFloat($(e).text().trim().replace(',', ''));
                 }
             });
-            commodityPriceList.push({
-                "name": commodityName,
-                "price": commodityPrice
-            });
+            investingList.push(
+                InvestingModel({
+                    _id: {
+                        symbol: commodityName,
+                        type: "commodity"
+                    },
+                    name: commodityName,
+                    price: commodityPrice,
+                    created_at: new Date()
+                })
+            );
         });
     });
 
-    console.log(commodityPriceList);
+    await InvestingModel.deleteMany({
+        "_id.type": { $in: ["exchange", "commodity"]}
+    });
+    await InvestingModel.insertMany(investingList);
+    disconnectFromMongoDB();
 }
 
 async function getExchangeRates() {
+    investingExchangeList = [];
     exchangeList = [];
     exchangePriceList = [];
 
@@ -38,7 +47,20 @@ async function getExchangeRates() {
     const $ = cheerio.load(result);
 
     $(".list-group > .list-group-item").each((_, element) => {
-        exchangeList.push($(element).text().split("(")[1].replace(")", ''));
+        const exchangeSymbol = $(element).text().split("(")[1].replace(")", '');
+        const exchangeName = $(element).text().split("(")[0].trimEnd().trimStart();
+        investingExchangeList.push(
+            InvestingModel({
+                _id: {
+                    symbol: exchangeSymbol,
+                    type: "exchange"
+                },
+                name: exchangeName,
+                price: 1,
+                created_at: new Date()
+            })
+        );
+        exchangeList.push(exchangeSymbol);
     });
 
     for (const index in exchangeList) {
@@ -58,26 +80,28 @@ async function getExchangeRates() {
                             exchangeRate = parseFloat(itemText.split(" ")[0]);
                         }
                     });
-
-                    saveExchangeModel(exchangeList[index], exchangeSymbol, exchangeRate);
+                    
+                    exchangePriceList.push(
+                        ExchangeModel({
+                            from_exchange: exchangeList[index],
+                            to_exchange: exchangeSymbol,
+                            exchange_rate: exchangeRate,
+                            created_at: new Date()
+                        })
+                    );
                 });
             }
         });
     }
 
-    console.log(exchangeList);
+    await ExchangeModel.deleteMany({});
+    await ExchangeModel.insertMany(exchangePriceList);
+    getCommodityPrices(investingExchangeList);
 }
-
-/*TODO: 
-Save exchange list to database
-Save commodity to investings
-*/
 
 async function main() {
     await connectToMongoDB();
-
-    getCommodityPrices();
-    getExchangeRates();
+    await getExchangeRates();
 }
 
 main();
