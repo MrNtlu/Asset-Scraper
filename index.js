@@ -5,11 +5,12 @@ const { GetExchangeRates } = require("./scrapers/exchange");
 async function main() {
     try{
         await ConnectToMongoDB();
-        //await GetExchangeRates();
+        await GetExchangeRates();
         await GetStocks();
         await DisconnectFromMongoDB();
     } catch(err) {
         console.log('Error occured', err);
+        return;
     }
 }
 

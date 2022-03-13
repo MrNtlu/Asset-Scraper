@@ -32,12 +32,13 @@ const InvestingModel = mongoose.model(
   mongoose.Schema({
       _id: mongoose.Schema({
           symbol: String,
-          type: String
+          type: String,
+          stock_market: String,
+          stock_currency: String
       }, { _id : false }),
       name: String,
       price: Number,
       created_at: Date,
-      stock_market: String
   }, {
     versionKey: false
   }

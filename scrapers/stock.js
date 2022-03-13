@@ -25,7 +25,11 @@ async function getStocks() {
         );
     }
 
-    console.log(stockList);
+    await InvestingModel.deleteMany({
+        "_id.stock_currency": { $in: smIndexCurrencyList},
+        "_id.type": "exchange"
+    });
+    await InvestingModel.insertMany(stockList);
 }
 
 async function getStocksData(url, stockCurrency, stockMarket, stockList, isRefreshed = false) {
@@ -40,13 +44,15 @@ async function getStocksData(url, stockCurrency, stockMarket, stockList, isRefre
 
         //".marketInnerContent > table > tbody > tr"
         $("#cross_rate_markets_stocks_1 > tbody > tr").each((_, element) => {
+            const stockName = $(element).find("a").text().trimEnd().trimStart();
             stockList.push(InvestingModel({
                 _id: {
-                    symbol: stockCurrency,
-                    type: "stock"
+                    symbol: stockName,
+                    type: "stock",
+                    stock_currency: stockCurrency,
+                    stock_market: stockMarket,
                 },
-                stock_market: stockMarket,
-                name: $(element).find("a").text().trimEnd().trimStart(),
+                name: stockName,
                 price: parseFloat($($(element).find("td")[2]).text().trimEnd().trimStart()),
                 created_at: new Date()
             }));
