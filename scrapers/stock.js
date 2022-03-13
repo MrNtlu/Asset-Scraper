@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
+const AdblockerPlugin = require('puppeteer-extra-plugin-block-resources');
 const AnonymousPlugin = require('puppeteer-extra-plugin-anonymize-ua');
 const cheerio = require("cheerio");
 const { InvestingModel } = require('../mongodb');
