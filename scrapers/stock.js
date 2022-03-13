@@ -27,7 +27,7 @@ async function getStocks() {
 
     await InvestingModel.deleteMany({
         "_id.stock_currency": { $in: smIndexCurrencyList},
-        "_id.type": "exchange"
+        "_id.type": "stock"
     });
     await InvestingModel.insertMany(stockList);
 }
