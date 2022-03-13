@@ -3,7 +3,7 @@ const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker');
 const AnonymousPlugin = require('puppeteer-extra-plugin-anonymize-ua');
 const cheerio = require("cheerio");
-const { InvestingModel, DisconnectFromMongoDB } = require('../mongodb');
+const { InvestingModel } = require('../mongodb');
 
 async function getStocks() {
     const baseURL = "https://www.investing.com/equities/StocksFilter?index_id=";
@@ -30,9 +30,12 @@ async function getStocks() {
 
 async function getStocksData(url, stockCurrency, stockMarket, stockList, isRefreshed = false) {
     try {
-        const browser = await puppeteer.launch({ headless: false, args: ["--no-sandbox"] });
+        const browser = await puppeteer.launch({ headless: true, args: ["--no-sandbox", '--disable-setuid-sandbox'] });
         const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36');
         await page.goto(url);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.screenshot({ path: `chromium.png` });
         await page.waitForSelector('#cross_rate_markets_stocks_1');
         await new Promise(resolve => setTimeout(resolve, 1500));
         const html = await page.content();
