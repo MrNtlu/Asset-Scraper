@@ -91,7 +91,6 @@ async function getStockSymbol(url, stockList, index, isRefreshed = false) {
         }
         await browser.close()
         stockList[index]._id.symbol = symbol;
-        //await new Promise(resolve => setTimeout(resolve, 1000));   
     } catch (error) {
         console.log(error);
         if (!isRefreshed) {
