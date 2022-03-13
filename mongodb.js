@@ -36,7 +36,8 @@ const InvestingModel = mongoose.model(
       }, { _id : false }),
       name: String,
       price: Number,
-      created_at: Date
+      created_at: Date,
+      stock_market: String
   }, {
     versionKey: false
   }
@@ -44,5 +45,5 @@ const InvestingModel = mongoose.model(
 
 module.exports.InvestingModel = InvestingModel;
 module.exports.ExchangeModel = ExchangeModel;
-module.exports.connectToMongoDB = connectToMongoDB;
-module.exports.disconnectFromMongoDB = disconnectFromMongoDB;
+module.exports.ConnectToMongoDB = connectToMongoDB;
+module.exports.DisconnectFromMongoDB = disconnectFromMongoDB;

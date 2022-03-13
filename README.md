@@ -5,6 +5,8 @@
 <ul>
     <li> Cheerio
     <li> Request-Promise
+    <li> Puppeteer
+    <li> Puppeteer-Extra
 </ul>
 
 Flutter (Android/Mac/Windows/iOS): [Asset Manager Flutter](https://github.com/MrNtlu/Asset-Manager-Flutter)
