@@ -25,11 +25,17 @@ async function getStocks() {
         );
     }
 
-    await InvestingModel.deleteMany({
-        "_id.stock_currency": { $in: smIndexCurrencyList},
-        "_id.type": "stock"
+    const session = await InvestingModel.startSession();
+    await session.withTransaction(async () => {
+        await InvestingModel.deleteMany({
+            "_id.stock_currency": { $in: smIndexCurrencyList},
+            "_id.type": "stock"
+        });
+        await InvestingModel.insertMany(stockList, {
+            ordered: false
+        });
     });
-    await InvestingModel.insertMany(stockList);
+    session.endSession();
 }
 
 async function getStocksData(url, stockCurrency, stockMarket, stockList, isRefreshed = false) {

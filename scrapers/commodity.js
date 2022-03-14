@@ -20,7 +20,7 @@ async function getCommodityPrices(investingList) {
             investingList.push(
                 InvestingModel({
                     _id: {
-                        symbol: commodityName,
+                        symbol: getSymbolFromName(commodityName),
                         type: "commodity"
                     },
                     name: commodityName,
@@ -35,6 +35,21 @@ async function getCommodityPrices(investingList) {
         "_id.type": { $in: ["exchange", "commodity"]}
     });
     await InvestingModel.insertMany(investingList);
+}
+
+function getSymbolFromName(name) {
+    switch (name) {
+        case "Gold":
+            return "XAU";
+        case "Platinum":
+            return "XPT";
+        case "Palladium":
+            return "XPD";
+        case "Silver":
+            return "XAG";
+        default:
+            return name;
+    }
 }
 
 module.exports.GetCommodityPrices = getCommodityPrices;
