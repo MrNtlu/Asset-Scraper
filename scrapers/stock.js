@@ -64,7 +64,8 @@ async function getStocksData(url, stockCurrency, stockMarket, stockList, isRefre
         });
         await browser.close();
     } catch (error) {
-        console.log(error);
+        console.log("\nURL: ",url,"\nStock Currency:",stockCurrency,"\nStock Market:",stockMarket);
+        console.log("GetStocksData Error",error);
         if (!isRefreshed) {
             console.log("Refreshed");
             await getStocksData(url, stockCurrency, stockMarket, stockList, true);
