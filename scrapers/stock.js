@@ -7,9 +7,9 @@ const { InvestingModel } = require('../mongodb');
 
 async function getStocks() {
     const baseURL = "https://www.investing.com/equities/StocksFilter?index_id=";
-    const smIndexList = [172, 19155, 167, 27, 176, 178, 179, 38017, 40820];
-    const smIndexNameList = ["DAX", "BIST 100", "CAC 40", "FTSE 100", "SMI", "Nikkei 225", "Hang Seng", "Taiwan Weighted", "Shanghai Composite"];
-    const smIndexCurrencyList = ["EUR", "TRY","EUR", "GBP", "CHF", "JPY", "HKD", "TWD", "CNY"]
+    const smIndexList = [20, 166, 169, 172, 19155, 167, 27, 176, 178, 179, 38017, 40820];
+    const smIndexNameList = ["Nasdaq 100", "S&P 500", "Dow Jones Industrial Average", "DAX", "BIST 100", "CAC 40", "FTSE 100", "SMI", "Nikkei 225", "Hang Seng", "Taiwan Weighted", "Shanghai Composite"];
+    const smIndexCurrencyList = ["USD", "USD", "USD", "EUR", "TRY","EUR", "GBP", "CHF", "JPY", "HKD", "TWD", "CNY"]
     const stockList = [];
 
     puppeteer.use(StealthPlugin());
@@ -28,7 +28,6 @@ async function getStocks() {
     const session = await InvestingModel.startSession();
     await session.withTransaction(async () => {
         await InvestingModel.deleteMany({
-            "_id.stock_currency": { $in: smIndexCurrencyList},
             "_id.type": "stock"
         });
         await InvestingModel.insertMany(stockList, {
