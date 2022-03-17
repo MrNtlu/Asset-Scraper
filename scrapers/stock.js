@@ -55,7 +55,7 @@ async function getStocksData(url, stockCurrency, stockMarket, stockList, isRefre
                     symbol: stockName,
                     type: "stock",
                     stock_currency: stockCurrency,
-                    stock_market: stockMarket,
+                    market: stockMarket,
                 },
                 name: stockName,
                 price: parseFloat($($(element).find("td")[2]).text().trimEnd().trimStart()),

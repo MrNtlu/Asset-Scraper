@@ -33,7 +33,7 @@ const InvestingModel = mongoose.model(
       _id: mongoose.Schema({
           symbol: String,
           type: String,
-          stock_market: String,
+          market: String,
           stock_currency: String
       }, { _id : false }),
       name: String,

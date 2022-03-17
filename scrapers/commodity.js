@@ -21,7 +21,8 @@ async function getCommodityPrices(investingList) {
                 InvestingModel({
                     _id: {
                         symbol: getSymbolFromName(commodityName),
-                        type: "commodity"
+                        type: "commodity",
+                        market: "Business Insider"
                     },
                     name: commodityName,
                     price: commodityPrice,

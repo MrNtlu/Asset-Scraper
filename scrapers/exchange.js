@@ -18,7 +18,8 @@ async function getExchangeRates() {
             InvestingModel({
                 _id: {
                     symbol: exchangeSymbol,
-                    type: "exchange"
+                    type: "exchange",
+                    market: "Forex"
                 },
                 name: exchangeName,
                 price: 1,
