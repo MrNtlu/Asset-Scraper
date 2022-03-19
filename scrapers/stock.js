@@ -75,43 +75,4 @@ async function getStocksData(url, stockCurrency, stockMarket, stockList, isRefre
     }
 }
 
-async function getStockSymbol(url, stockList, index, isRefreshed = false) {
-    // for (let index = 0; index < stockList.length; index++) {
-    //     await getStockSymbol(stockList[index]._id.symbol, stockList, index);
-    // }
-    const browser = await puppeteer.launch({ headless: false });
-    const page = await browser.newPage();
-    const baseURL = "https://www.investing.com";
-    try {
-        await page.setExtraHTTPHeaders({
-            'Accept-Language': 'en-US,en;q=0.9'
-        });
-        await page.goto(baseURL + url);
-        await page.waitForSelector('.text-2xl');
-        await page.waitForNavigation({
-            waitUntil: 'networkidle0',
-        });
-        const html = await page.content();
-        const $ = cheerio.load(html);
-        
-        console.log("URL ", url);
-        var symbol;
-        try {
-            symbol = $("h1.text-2xl").text().split("(")[1].replace(")", '').trimStart().trimEnd();
-        } catch (error) {
-            symbol = $("h1").text().split("(")[1].replace(")", '').trimStart().trimEnd();
-        }
-        await browser.close()
-        stockList[index]._id.symbol = symbol;
-    } catch (error) {
-        console.log(error);
-        if (!isRefreshed) {
-            console.log("Refreshed");
-            await getStockSymbol(url, stockList, index, true);
-            return;
-        } 
-        return;
-    }
-}
-
 module.exports.GetStocks = getStocks;
