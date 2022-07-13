@@ -8,6 +8,9 @@ async function getExchangeRates() {
     exchangeList = [];
     exchangePriceList = [];
 
+    isExchangePriceListBugged = false
+    const exchangePriceListCheck = ["USD", "EUR", "JPY", "GBP", "CAD", "INR"]
+
     const result = await request.get("https://www.forex-ratings.com/currency-exchange-rates/");
     const $ = cheerio.load(result);
 
@@ -34,7 +37,7 @@ async function getExchangeRates() {
         const $ = cheerio.load(rateResult);
 
         $("table").each((innerIndex, element) => {
-            if (innerIndex == 0) {
+            if (innerIndex == 0 && !isExchangePriceListBugged) {
                 $(element).find("tbody > tr").each((_, innerElement) => {
                     var exchangeSymbol;
                     var exchangeRate;
@@ -46,6 +49,11 @@ async function getExchangeRates() {
                             exchangeRate = parseFloat(itemText.split(" ")[0]);
                         }
                     });
+
+                    if (exchangeRate == 0 && exchangePriceListCheck.includes(exchangeList[index])) {
+                        isExchangePriceListBugged = true;
+                        return;
+                    }
                     
                     exchangePriceList.push(
                         ExchangeModel({
@@ -60,8 +68,10 @@ async function getExchangeRates() {
         });
     }
 
-    await ExchangeModel.deleteMany({});
-    await ExchangeModel.insertMany(exchangePriceList);
+    if (isExchangePriceListBugged) {
+        await ExchangeModel.deleteMany({});
+        await ExchangeModel.insertMany(exchangePriceList);
+    }
     await GetCommodityPrices(investingExchangeList);
 }
 
